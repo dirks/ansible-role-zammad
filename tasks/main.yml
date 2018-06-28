@@ -39,16 +39,19 @@
     groups: nginx
     append: yes
 
-- name: create zammad ssl dir
-  file:
-    path: "{{ zammad_ssl_dir }}"
-    state: directory
-    mode: 0750
-    owner: root
-    group: nginx
+- name: ssl specific stuff
+  block:
+    - name: create zammad ssl dir
+      file:
+        path: "{{ zammad_ssl_dir }}"
+        state: directory
+        mode: 0750
+        owner: root
+        group: nginx
 
-- name: copy cert from localhost to system
-  local_action: command scp "{{ zammad_ssl_cert_key_local_path }}/{{ zammad_ssl_cert_key }}" "{{ zammad_ssl_cert_local_path }}/{{ zammad_ssl_cert }}" "{{ ansible_fqdn }}:{{ zammad_ssl_dir }}"
+    - name: copy cert from localhost to system
+      local_action: command scp "{{ zammad_ssl_cert_key_local_path }}/{{ zammad_ssl_cert_key }}" "{{ zammad_ssl_cert_local_path }}/{{ zammad_ssl_cert }}" "{{ ansible_fqdn }}:{{ zammad_ssl_dir }}"
+  when: zammad_ssl_on
 
 #- name: config elasticsearch for zammad
 #  command: zammad run rails r "Setting.set('es_url', 'http://localhost:9200')"
